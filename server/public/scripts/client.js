@@ -7,7 +7,7 @@ function getKoalas() {
     .get("/koalas")
     .then((response) => {
       console.log("GET response:", response.data);
-      renderKoalas(response.data);
+      renderKoalas();
     })
     .catch((error) => {
       console.log("Koalas GET failed");
@@ -56,8 +56,8 @@ function renderKoalas() {
         <td>${koala.gender}</td>
         <td>${koala.readyforTransfer}</td>
         <td>${koala.notes}</td>
-        <button onclick="readyforTransfer(event)">Ready for Transfer</button>
-        <td><button onclick="deleteKoala(event, true)">Delete</button></td>
+        <button onclick="readyforTransfer(event, true)">Ready for Transfer</button>
+        <td><button onclick="deleteKoala(event)">Delete</button></td>
         </tr>
     `;
   });
@@ -69,7 +69,7 @@ function deleteKoala(event) {
   const koalaId = event.target.closest("tr").dataset.id;
 
   axios
-    .delete(`/books/${koalaId}`)
+    .delete(`/koalas/${koalaId}`)
     .then((response) => {
       console.log("Bye bye Koala:", koalaId);
       getKoalas();
@@ -81,8 +81,9 @@ function deleteKoala(event) {
 }
 function readyforTransfer(event, readyforTransfer) {
   event.preventDefault();
+  let koalaId = event.target.closest("tr").dataset.id
   axios
-    .put(`/books/${koalaId}`, { readyforTransfer })
+    .put(`/koalas/${koalaId}`, { readyforTransfer })
     .then((response) => {
       console.log("Koala is ready to transfer!:", koalaId);
       getKoalas();
