@@ -38,15 +38,15 @@ function saveKoala(event) {
     data: koalasToAdd
   })
     .then((response) => {
-      // console.log("in POST request", response.data);
-      // document.getElementById("nameIn").value = "";
-      // document.getElementById("ageIn").value = "";
-      // document.getElementById("genderIn").value = "";
-      // document.getElementById("readyForTransferIn").value = "";
-      // document.getElementById("notesIn").value = "";
+      console.log("in POST request", response.data);
+      document.getElementById("nameIn").value = "";
+      document.getElementById("ageIn").value = "";
+      document.getElementById("genderIn").value = "";
+      document.getElementById("readyForTransferIn").value = "";
+      document.getElementById("notesIn").value = "";
       getKoalas()
     })
-    
+
     .catch((error) => {
       console.log("POST error!");
       console.log(error);
@@ -58,6 +58,8 @@ function renderKoalas(koalas) {
   console.log("Koalas:", koalas);
   viewKoalas.innerHTML = "";
   koalas.forEach((koala) => {
+
+
     viewKoalas.innerHTML += `
   <tr data-id="${koala.id}">
         <td>${koala.name}</td>
@@ -65,11 +67,24 @@ function renderKoalas(koalas) {
         <td>${koala.gender}</td>
         <td>${koala.ready_for_transfer}</td>
         <td>${koala.notes}</td>
-        <td><button onclick="readyforTransfer(event, true)">Ready for Transfer</button></td>
+        <td><button id ="${koala.id}" onclick="readyforTransfer(event, true)">Ready for Transfer</button></td>
         <td><button onclick="deleteKoala(event)">Delete</button></td>
         </tr>
     `;
   });
+  
+  // loop through koalas array to hide button 
+  for(let koalaRFT of koalas){
+  // console.log("koalaRFT", koalaRFT.ready_for_transfer)
+  // if koala ready for transfer is true, change btn to hidden
+  if(koalaRFT.ready_for_transfer === true) {
+      // console.log("if statement working:", koalaRFT.ready_for_transfer);
+      // declare btn = to id of button
+      let transferBtn = document.getElementById(`${koalaRFT.id}`)
+      // set button by id equal to hidden
+      transferBtn.style.visibility = "hidden"
+    }
+  }
 }
 
 function deleteKoala(event) {
@@ -101,6 +116,7 @@ function readyforTransfer(event, readyforTransfer) {
       console.log("NO I DONT WANNA GO!:");
       console.log(error);
     });
+
 }
 
 onReady()
