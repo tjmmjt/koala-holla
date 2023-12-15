@@ -5,9 +5,9 @@ const koalaRouter = express.Router();
 const pool = require('../modules/pool.js')
 
 // GET
-router.get('/', (req, res) => {
+koalaRouter.get('/', (req, res) => {
     // declare queryText, select all koala data, order by name
-    const queryText = `SELECT * FROM "koala" ORDER BY "name";`
+    const queryText = `SELECT * FROM "koala";`
     
     // send query
     pool.query(queryText)
@@ -22,10 +22,19 @@ router.get('/', (req, res) => {
 
 
 // POST
-router.post('/', (res, req) => {
+koalaRouter.post('/', (req, res) => {
     // newKoala will be req.body
+    console.log("Req.Body:", req.body);
     let incKoala = req.body
-    console.log("New fuzzy Koala:", newKoala);
+    let readForTransfer
+    if(incKoala.ready_for_transfer === "true"){
+        readForTransfer = true
+    } else {
+        readForTransfer = false
+    }
+
+
+    console.log("New fuzzy Koala:", incKoala);
 
     // insert newKoala into table
     const queryText = `
@@ -34,7 +43,7 @@ router.post('/', (res, req) => {
     `
 
     // set queryParams for queryText
-    const queryParams = [incKoala.name, incKoala.age, incKoala.gender, incKoala.ready_for_transfer, incKoala.notes]
+    const queryParams = [incKoala.name, incKoala.age, incKoala.gender, readForTransfer, incKoala.notes]
 
     // send queryText and queryParams to DB
     pool.query(queryText, queryParams)
@@ -49,18 +58,20 @@ router.post('/', (res, req) => {
 
 // PUT
 // when PUT request is made, use koala id to UPDATE 'ready for transfer' to true
-router.put('/:id', (req, res) => {
+koalaRouter.put('/:id', (req, res) => {
     // get the koala ID
     let koalaId = req.params.id
+    let koalaRFT = req.body.readyforTransfer
     console.log("koala ID:", koalaId);
+    console.log("Koala RFT", koalaRFT);
 
     // declare query text for UPDATE
     const queryText = `
-    UPDATE "koala" SET "ready_for_transfer"=true WHERE "id" = $1;
+    UPDATE "koala" SET "ready_for_transfer"=$1 WHERE "id" = $2;
     `
 
     // declare queryParams for ID
-    const queryParams = [koalaId]
+    const queryParams = [koalaRFT, koalaId]
 
     // send UPDATE to DB
     pool.query(queryText, queryParams)
@@ -74,9 +85,9 @@ router.put('/:id', (req, res) => {
 })
 
 // DELETE
-router.delete('/:id', (req, res) => {
+koalaRouter.delete('/:id', (req, res) => {
     // get id param
-    let deadKoala = req.param.id
+    let deadKoala = req.params.id
     console.log("This koala has got to go:", deadKoala);
 
     // queryText for DELETE
@@ -94,6 +105,6 @@ router.delete('/:id', (req, res) => {
     }) .catch((error) => {
         console.log("Saved by the activists:", error);
     })
-} )
+})
 
 module.exports = koalaRouter;
